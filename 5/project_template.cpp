@@ -162,7 +162,7 @@ int main() {
         Date date;
 
         GetStrings(command, input);
-        if (input[0] == "") {
+        if (input[0].size() == 0) {
             continue;
         }
         try {
@@ -199,6 +199,5 @@ int main() {
             return 0;
         }
     }
-
     return 0;
 }
