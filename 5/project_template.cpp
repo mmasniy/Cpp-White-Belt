@@ -22,21 +22,26 @@ public:
              << setw(2) << setfill('0') << GetDay();
     }
 
-    Date() {}
+    Date() {
+        day = 0;
+        month = 0;
+        year = 0;
+    }
 
     Date(int new_day, int new_month, int new_year) {
         year = new_year;
+        if (new_month < 1 || new_month > 12) {
+            throw invalid_argument("Month value is invalid: " + to_string(new_month));
+        }
+        else {
+            month = new_month;
+        }
+
         if (new_day < 1 || new_day > 31) {
             throw invalid_argument("Day value is invalid: " + to_string(new_day));
         }
         else {
             day = new_day;
-        }
-        if (new_month < 1 || new_month > 12) {
-            throw invalid_argument("Month value is invalid:" + to_string(new_month));
-        }
-        else {
-            month = new_month;
         }
     }
 
@@ -104,48 +109,53 @@ public:
         return events_count;
     }
     void Find(const Date& date) const {
-        set<string> finded = events.at(date);
+        if (events.count(date) != 0) {
+            set<string> finded = events.at(date);
 
-        for (const string& f : finded) {
-            cout << f << endl;
+            for (const string& f : finded) {
+                cout << f << endl;
+            }
         }
     }
   
     void Print() const {
         for (const auto& [key, value] : events) {
-            cout << key.GetYear()<< '-' << key.GetMonth() << "-" << key.GetDay() << ": ";
             for (const string& v : value) {
-                cout << v << " ";
+                cout << setw(4) << setfill('0') << key.GetYear() << "-" 
+                 << setw(2) << setfill('0') << key.GetMonth() << "-"
+                 << setw(2) << setfill('0') << key.GetDay() << " ";
+                cout << v << endl;
             }
-            cout << endl;
         }
     }
 };
 
 Date input_Date(const string& new_date) {
-    int day = 0, month = 0, year = 0;
-    Date date;
-    stringstream input(new_date);
+    int day, month, year;
+    if (!new_date.empty()) {
+        stringstream input(new_date);
 
-    if (!(input >> year)) {
-        string error = "Wrong date format: " + new_date;
-        throw invalid_argument(error);
+        if (!(input >> year)) {
+            string error = "Wrong date format: " + new_date;
+            throw invalid_argument(error);
+        }
+        input.ignore(1);
+        if (!(input >> month)) {
+            string error = "Wrong date format: " + new_date;
+            throw invalid_argument(error);
+        }
+        input.ignore(1);
+        if (!(input >> day)) {
+            string error = "Wrong date format: " + new_date;
+            throw invalid_argument(error);
+        }
+        if ((input.peek() != EOF)) {
+            string error = "Wrong date format: " + new_date;
+            throw invalid_argument(error);
+        }
+        return Date(day, month, year);
     }
-    input.ignore(1);
-    if (!(input >> month)) {
-        string error = "Wrong date format: " + new_date;
-        throw invalid_argument(error);
-    }
-    input.ignore(1);
-    if (!(input >> day)) {
-        string error = "Wrong date format: " + new_date;
-        throw invalid_argument(error);
-    }
-    if ((input.peek() != EOF)) {
-        string error = "Wrong date format: " + new_date;
-        throw invalid_argument(error);
-    }
-    return date = Date(day, month, year);
+    return {};
 }
 
 void GetStrings(const string& command, vector<string>& data) {
@@ -201,3 +211,5 @@ int main() {
     }
     return 0;
 }
+
+
